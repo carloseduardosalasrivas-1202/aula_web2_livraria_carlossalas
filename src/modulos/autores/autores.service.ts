@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { criarAutorDto } from './autores.dto';
+const livros = ['livro1', 'livro 2 '];
 let autores = [
   {
     id: 1,
@@ -44,5 +45,31 @@ export class AutoresService {
       nome: bodyRequest.nome,
       email: bodyRequest.email,
     });
+    return autores;
+  }
+
+  autolizarAutor(idAutor: number, bodyRequest: any) {
+    const autorEncontrado = autores.find((autor) => autor.id === idAutor);
+
+    if (!autorEncontrado) {
+      return 'Autor não encontrado';
+    }
+
+    if (bodyRequest.nome) {
+      autorEncontrado.nome = bodyRequest.nome;
+    }
+
+    if (bodyRequest.email) {
+      autorEncontrado.email = bodyRequest.email;
+    }
+
+    return autorEncontrado;
+  }
+  deletarAutor(idAutor: number) {
+    this.listarAutor(idAutor);
+
+    autores = autores.filter((autor) => autor.id !== idAutor);
+
+    return autores;
   }
 }
