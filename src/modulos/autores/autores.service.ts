@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { criarAutorDto } from './autores.dto';
+import { autoresrepository } from './autores.repository';
 const livros = ['livro1', 'livro 2 '];
 let autores = [
   {
@@ -21,6 +22,12 @@ let autores = [
 
 @Injectable()
 export class AutoresService {
+  constructor(private readonly autoresrepository: autoresrepository) {}
+
+  async listarautores() {
+    return await this.autoresrepository.listarAutores();
+  }
+
   listarAutores() {
     if (!autores) {
       return 'não há autores cadastros ';

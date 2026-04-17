@@ -16,9 +16,8 @@ export class AutoresController {
   constructor(private readonly autoresService: AutoresService) {}
 
   @Get('/listar-autores')
-  listarAutores() {
-    console.log('ListarController');
-    return this.autoresService.listarAutores();
+  async listarAutores() {
+    return await this.autoresService.listarAutores();
   }
 
   @Get('/listar-autores/:id')
