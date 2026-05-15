@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { criarAutorDto } from './autores.dto';
-import { autoresrepository } from './autores.repository';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CriarAutorDto } from './autores.dto';
+import { AutoresRepository } from './autores.repository';
+import { NotFoundError } from 'rxjs';
 const livros = ['livro1', 'livro 2 '];
 let autores = [
   {
@@ -22,7 +23,7 @@ let autores = [
 
 @Injectable()
 export class AutoresService {
-  constructor(private readonly autoresrepository: autoresrepository) {}
+  constructor(private readonly autoresrepository: AutoresRepository) {}
 
   async listarautores() {
     return await this.autoresrepository.listarAutores();
@@ -34,44 +35,24 @@ export class AutoresService {
     }
     return autores;
   }
-  listarAutor(id: number) {
-    const autorEncontrado = autores.find((autor) => autor.id === id);
+  async listarAutor(id: number) {
+    const autorEncontrado = await this.autoresrepository.listarAutor(id);
 
-    if (!autorEncontrado) {
-      return 'Autor não encontrado';
+    if (autorEncontrado.length === 0) {
+      throw new NotFoundException(`Autor com id ${id} não encontrado`);
     }
     return autorEncontrado;
   }
-
-  criarAutor(bodyRequest: criarAutorDto) {
-    if (!bodyRequest.nome || !bodyRequest.email) {
-      return 'Nome e email são obrigatorios';
-    }
-    autores.push({
-      id: autores.length + 1,
-      nome: bodyRequest.nome,
-      email: bodyRequest.email,
-    });
-    return autores;
+  criarAutor(bodyRequest: CriarAutorDto) {
+    return this.autoresrepository.criarAutor(bodyRequest);
   }
 
-  autolizarAutor(idAutor: number, bodyRequest: any) {
-    const autorEncontrado = autores.find((autor) => autor.id === idAutor);
+  async atualizarAutor(idAutor: number, bodyRequest: CriarAutorDto) {
+    await this.listarAutor(idAutor);
 
-    if (!autorEncontrado) {
-      return 'Autor não encontrado';
-    }
-
-    if (bodyRequest.nome) {
-      autorEncontrado.nome = bodyRequest.nome;
-    }
-
-    if (bodyRequest.email) {
-      autorEncontrado.email = bodyRequest.email;
-    }
-
-    return autorEncontrado;
+    return await this.autoresrepository.atualizarAutor(idAutor, bodyRequest);
   }
+
   deletarAutor(idAutor: number) {
     this.listarAutor(idAutor);
 
